@@ -39,13 +39,7 @@ func (b *DefaultBinder) Bind(i interface{}, c Context) (err error) {
 		}
 		return NewHTTPError(http.StatusBadRequest, "Request body can't be empty")
 	}
-	// Slice Don't Bind the route parameter
-	typ := reflect.TypeOf(i).Elem()
-	if typ.Kind() != reflect.Slice {
-		if err = b.bindPathData(i, c); err != nil {
-			return NewHTTPError(http.StatusBadRequest, err.Error())
-		}
-	}
+
 	ctype := req.Header.Get(HeaderContentType)
 	switch {
 	case strings.HasPrefix(ctype, MIMEApplicationJSON):
@@ -78,6 +72,23 @@ func (b *DefaultBinder) Bind(i interface{}, c Context) (err error) {
 		}
 	default:
 		return ErrUnsupportedMediaType
+	}
+
+	// In the case of Slice, Binding route parameters to all elements
+	typ := reflect.TypeOf(i).Elem()
+	if typ.Kind() == reflect.Slice {
+		rv := reflect.ValueOf(i).Elem()
+		l := rv.Len()
+		for cnt := 0; cnt < l; cnt++ {
+			v := rv.Index(cnt)
+			if err = b.bindPathData(&v, c); err != nil {
+				return NewHTTPError(http.StatusBadRequest, err.Error())
+			}
+		}
+	} else {
+		if err = b.bindPathData(i, c); err != nil {
+			return NewHTTPError(http.StatusBadRequest, err.Error())
+		}
 	}
 	return
 }
