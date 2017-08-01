@@ -28,7 +28,7 @@ type users []user
 const (
 	userJSON         = `{"id":1,"name":"Jon Snow"}`
 	userJSONOnlyName = `{"name":"Jon Snow"}`
-	userJSONMulti    = `[{"id":1,"name":"Jon Snow"},{"id":2,"name":"yasu aki"}]`
+	userJSONMulti    = `[{"id":1,"name":"Jon Snow"},{"id":2,"name":"John Smith"}]`
 	userXML          = `<user><id>1</id><name>Jon Snow</name></user>`
 	userForm         = `id=1&name=Jon Snow`
 	invalidContent   = "invalid content"
